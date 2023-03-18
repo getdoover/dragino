@@ -158,9 +158,9 @@ function Decode(fPort, bytes) {
                 temp : {
                   currentValue : Number(decode.TempC_SHT)
                 },
-                humidity : {
-                  currentValue : Number(decode.Hum_SHT)
-                },
+                // humidity : {
+                //   currentValue : Number(decode.Hum_SHT)
+                // },
                 rawBattery : {
                   currentValue : decode.BatV
                 }

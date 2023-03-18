@@ -119,37 +119,37 @@ class target:
                             }
                         ]
                     },
-                    "humidity": {
-                        "type": "uiVariable",
-                        "name": "humidity",
-                        "displayString": "Humidity (%)",
-                        "varType": "float",
-                        "decPrecision": 1,
-                        "form": "radialGauge",
-                        "ranges": [
-                            {
-                                "label" : "Very Dry",
-                                "min" : 0,
-                                "max" : 30,
-                                "colour" : "yellow",
-                                "showOnGraph" : True
-                            },
-                            {
-                                "label" : "Normal",
-                                "min" : 30,
-                                "max" : 60,
-                                "colour" : "green",
-                                "showOnGraph" : True
-                            },
-                            {
-                                "label" : "Wet",
-                                "min" : 60,
-                                "max" : 100,
-                                "colour" : "blue",
-                                "showOnGraph" : True
-                            }
-                        ]
-                    },
+                    # "humidity": {
+                    #     "type": "uiVariable",
+                    #     "name": "humidity",
+                    #     "displayString": "Humidity (%)",
+                    #     "varType": "float",
+                    #     "decPrecision": 1,
+                    #     "form": "radialGauge",
+                    #     "ranges": [
+                    #         {
+                    #             "label" : "Very Dry",
+                    #             "min" : 0,
+                    #             "max" : 30,
+                    #             "colour" : "yellow",
+                    #             "showOnGraph" : True
+                    #         },
+                    #         {
+                    #             "label" : "Normal",
+                    #             "min" : 30,
+                    #             "max" : 60,
+                    #             "colour" : "green",
+                    #             "showOnGraph" : True
+                    #         },
+                    #         {
+                    #             "label" : "Wet",
+                    #             "min" : 60,
+                    #             "max" : 100,
+                    #             "colour" : "blue",
+                    #             "showOnGraph" : True
+                    #         }
+                    #     ]
+                    # },
                     "rawBattery": {
                                 "type": "uiVariable",
                                 "name": "rawBattery",
