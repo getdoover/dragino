@@ -79,12 +79,143 @@ class target:
                 "type" : "uiContainer",
                 "displayString" : "",
                 "children" : {
-                    "isWorking" : {
-                        "type" : "uiVariable",
-                        "varType" : "float",
-                        "name" : "isWorking",
-                        "displayString" : "Is it Working?",
-                        "currentValue" : True
+                    "temp": {
+                        "type": "uiVariable",
+                        "name": "temp",
+                        "displayString": "Temperature (C)",
+                        "varType": "float",
+                        "decPrecision": 1,
+                        "form": "radialGauge",
+                        "ranges": [
+                            {
+                                "label" : "Freezing",
+                                "min" : -10,
+                                "max" : 0,
+                                "colour" : "yellow",
+                                "showOnGraph" : True
+                            },
+                            {
+                                "label" : "Cold",
+                                "min" : 0,
+                                "max" : 15,
+                                "colour" : "blue",
+                                "showOnGraph" : True
+                            },
+                            {
+                                "label" : "Warm",
+                                "min" : 15,
+                                "max" : 30,
+                                "colour" : "yellow",
+                                "showOnGraph" : True
+                            },
+                            {
+                                "label" : "Hot",
+                                "min" : 30,
+                                "max" : 45,
+                                "colour" : "red",
+                                "showOnGraph" : True
+                            }
+                        ]
+                    },
+                    "humidity": {
+                        "type": "uiVariable",
+                        "name": "humidity",
+                        "displayString": "Humidity (%)",
+                        "varType": "float",
+                        "decPrecision": 1,
+                        "form": "radialGauge",
+                        "ranges": [
+                            {
+                                "label" : "Very Dry",
+                                "min" : 0,
+                                "max" : 30,
+                                "colour" : "yellow",
+                                "showOnGraph" : True
+                            },
+                            {
+                                "label" : "Normal",
+                                "min" : 30,
+                                "max" : 60,
+                                "colour" : "green",
+                                "showOnGraph" : True
+                            },
+                            {
+                                "label" : "Wet",
+                                "min" : 60,
+                                "max" : 100,
+                                "colour" : "blue",
+                                "showOnGraph" : True
+                            }
+                        ]
+                    },
+                    "rawBattery": {
+                                "type": "uiVariable",
+                                "name": "rawBattery",
+                                "displayString": "Battery (V)",
+                                "varType": "float",
+                                "decPrecision": 2
+                    },
+                    "signalStrength": {
+                        "type": "uiVariable",
+                        "name": "signalStrength",
+                        "displayString": "Signal Strength (%)",
+                        "varType": "float",
+                        "decPrecision": 0,
+                        "ranges": [
+                            {
+                                "label" : "Low",
+                                "min" : 0,
+                                "max" : 30,
+                                "colour" : "yellow",
+                                "showOnGraph" : True
+                            },
+                            {
+                                "label" : "Ok",
+                                "min" : 30,
+                                "max" : 60,
+                                "colour" : "blue",
+                                "showOnGraph" : True
+                            },
+                            {
+                                "label" : "Strong",
+                                "min" : 60,
+                                "max" : 100,
+                                "colour" : "green",
+                                "showOnGraph" : True
+                            }
+                        ]
+                    },
+                    "details_submodule": {
+                        "type": "uiSubmodule",
+                        "name": "details_submodule",
+                        "displayString": "Details",
+                        "children": {
+                            "lastRSSI": {
+                                "type": "uiVariable",
+                                "name": "lastRSSI",
+                                "displayString": "Last RSSI",
+                                "varType": "float"
+                            },
+                            "lastSNR": {
+                                "type": "uiVariable",
+                                "name": "lastSNR",
+                                "displayString": "Last SNR",
+                                "varType": "float"
+                            },
+                            "lastUsedGateway": {
+                                "type": "uiVariable",
+                                "name": "lastUsedGateway",
+                                "displayString": "Lora Gateway",
+                                "varType": "text"
+                            }
+                        }
+                    },
+                    "node_connection_info": {
+                        "type": "uiConnectionInfo",
+                        "name": "node_connection_info",
+                        "connectionType": "periodic",
+                        "connectionPeriod": 600,
+                        "nextConnection": 600
                     }
                 }
             }
@@ -100,8 +231,80 @@ class target:
         pass
 
     def uplink(self):
-        ## Run any uplink processing code here
-        pass
+        
+        ## Get the deployment channel
+        ui_state_channel = self.cli.get_channel(
+            channel_name="ui_state",
+            agent_id=self.kwargs['agent_id']
+        )
+        
+        self.update_reported_signal_strengths(ui_state_channel)
+
+
+    def update_reported_signal_strengths(self, state_channel):
+
+        msg_id = channel_id = payload = None
+        if 'msg_obj' in self.kwargs and self.kwargs['msg_obj'] is not None:
+            msg_id = self.kwargs['msg_obj']['message']
+            channel_id = self.kwargs['msg_obj']['channel']
+            payload = self.kwargs['msg_obj']['payload']
+
+        if not msg_id:
+            self.add_to_log( "No trigger message passed - skipping processing" )
+        else:
+            
+            # trigger_msg = pd.message_log(
+            #     api_client=self.cli.api_client,
+            #     message_id=msg_id,
+            #     channel_id=channel_id,
+            # )
+            # trigger_msg.update()
+
+            # payload = json.loads( trigger_msg.get_payload() )
+
+            rssi = snr = gateway_id = None
+            try:
+                rssi = payload['uplink_message']['rx_metadata'][0]['rssi']
+                snr = payload['uplink_message']['rx_metadata'][0]['snr']
+                gateway_id = payload['uplink_message']['rx_metadata'][0]['gateway_ids']['gateway_id']
+            except Exception as e:
+                self.add_to_log("Could not extract rssi and snr data")
+                pass
+
+            if rssi and snr and gateway_id:
+                
+                min_rssi = -130
+                max_rssi = -50
+                signal_strength_percent = int(((rssi - max_rssi) / (max_rssi - min_rssi) + 1) * 100)
+                signal_strength_percent = max(signal_strength_percent, 0)
+                signal_strength_percent = min(signal_strength_percent, 100)
+
+                msg_obj = {
+                    "state" : {
+                        "children" : {
+                            "signalStrength" : {
+                                "currentValue" : signal_strength_percent
+                            },
+                            "details_submodule" : {
+                                "children" : {
+                                    "lastRSSI" : {
+                                        "currentValue" : rssi
+                                    },
+                                    "lastSNR" : {
+                                        "currentValue" : snr
+                                    },
+                                    "lastUsedGateway" : {
+                                        "currentValue" : gateway_id
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                state_channel.publish(
+                    msg_str=json.dumps(msg_obj),
+                    save_log=False
+                )
 
 
     def create_doover_client(self):
