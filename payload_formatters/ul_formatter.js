@@ -156,10 +156,10 @@ function Decode(fPort, bytes) {
         state : {
             children : {
                 temp : {
-                  currentValue : decode.TempC_SHT
+                  currentValue : Number(decode.TempC_SHT)
                 },
                 humidity : {
-                  currentValue : decode.Hum_SHT
+                  currentValue : Number(decode.Hum_SHT)
                 },
                 rawBattery : {
                   currentValue : decode.BatV
