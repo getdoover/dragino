@@ -270,7 +270,7 @@ class target:
                 snr = payload['uplink_message']['rx_metadata'][0]['snr']
                 gateway_id = payload['uplink_message']['rx_metadata'][0]['gateway_ids']['gateway_id']
             except Exception as e:
-                self.add_to_log("Could not extract rssi and snr data")
+                self.add_to_log("Could not extract rssi and snr data: " + str(e))
                 pass
 
             if rssi and snr and gateway_id:
