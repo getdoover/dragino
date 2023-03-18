@@ -11,6 +11,7 @@ import os, sys, time, json
 ## You can import the pydoover module to interact with Doover based on decisions made in this function
 ## Just add the current directory to the path first
 
+
 sys.path.append(os.path.dirname(__file__))
 
 ## attempt to delete any loaded pydoover modules that persist across lambdas
@@ -327,7 +328,7 @@ class target:
         self._log = self._log + str(msg) + "\n"
 
     def complete_log(self):
-        if hasattr(self, '_log') and self.log is not None:
+        if hasattr(self, '_log') and self._log is not None:
             log_channel = self.cli.get_channel( channel_id=self.kwargs['log_channel'] )
             log_channel.publish(
                 msg_str=self._log
