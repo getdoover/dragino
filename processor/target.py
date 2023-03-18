@@ -80,7 +80,8 @@ class target:
         ## Get the deployment channel
         ui_state_channel = self.cli.get_channel(
             channel_name="ui_state",
-            agent_id=self.kwargs['agent_id'] )
+            agent_id=self.kwargs['agent_id']
+        )
 
         ui_obj = {
             "state" : {
