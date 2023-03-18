@@ -97,13 +97,6 @@ class target:
                         "form": "radialGauge",
                         "ranges": [
                             {
-                                "label" : "Freezing",
-                                "min" : -10,
-                                "max" : 0,
-                                "colour" : "yellow",
-                                "showOnGraph" : True
-                            },
-                            {
                                 "label" : "Cold",
                                 "min" : 0,
                                 "max" : 15,
