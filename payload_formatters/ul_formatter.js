@@ -99,13 +99,13 @@ function Decode(fPort, bytes) {
   }
 
 
-  
+
   decode.doover_channels = {
     ui_state : {
         state : {
             children : {
                 temp : {
-                  currentValue : Number(decode.TempC_SHT)
+                  currentValue : Number(decode.TempC1)
                 },
                 // humidity : {
                 //   currentValue : Number(decode.Hum_SHT)
